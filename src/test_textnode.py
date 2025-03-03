@@ -14,6 +14,11 @@ class TestTextNode(unittest.TestCase):
         node2 = TextNode("This is a text node", TextType.BOLD)
         self.assertNotEqual(node, node2)
 		
+    def test_repr(self):
+        node = TextNode("This is a text node", TextType.NORMAL, "www.cli.co")
+        self.assertTrue("This is a text node" in repr(node))
+        self.assertTrue("normal" in repr(node))
+        self.assertTrue("www.cli.co" in repr(node))
 
 
 if __name__ == "__main__":
