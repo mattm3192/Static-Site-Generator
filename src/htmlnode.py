@@ -30,7 +30,10 @@ class LeafNode(HTMLNode):
 			return f"{self.value}"
 		if self.tag == "a":
 			props_html = super().props_to_html()
-			return f"<a{props_html}>{self.value}</a>"
+			return f"<{self.tag}{props_html}>{self.value}</{self.tag}>"
+		if self.tag == "img":
+			props_html = super().props_to_html()
+			return f"<{self.tag}{props_html}/>"
 		return f"<{self.tag}>{self.value}</{self.tag}>"
 	
 class ParentNode(HTMLNode):
@@ -42,4 +45,8 @@ class ParentNode(HTMLNode):
 			raise ValueError("Object must have a tag.")
 		if self.children is None:
 			raise ValueError("A parent node must have children.")
-		
+		html_string = f"<{self.tag}>"
+		for child in self.children:
+			html_string += child.to_html()
+		html_string += f"</{self.tag}>"
+		return html_string
