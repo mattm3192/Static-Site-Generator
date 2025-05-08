@@ -94,5 +94,36 @@ class Markdowntotext(unittest.TestCase):
 		self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], link_matches)
 		self.assertListEqual([], image_matches)
 
+	def test_split_images(self):
+		node = TextNode("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)", TextType.NORMAL)
+		new_nodes = split_nodes_image([node])
+		self.assertListEqual([TextNode("This is text with an ", TextType.NORMAL), 
+						TextNode("image", TextType.IMAGES, "https://i.imgur.com/zjjcJKZ.png"),
+						TextNode(" and another ", TextType.NORMAL),
+						TextNode("second image", TextType.IMAGES, "https://i.imgur.com/3elNhQu.png"),
+						], new_nodes)
+		
+	def test_split_images_multiple_nodes(self):
+		pass
+
+	def test_split_images_no_images(self):
+		pass
+		
+	def test_split_links(self):
+		node = TextNode("This is text with a [link to google](https://www.google.com) and a second [link to boots](https://www.boot.dev) with text after.", TextType.NORMAL)
+		new_nodes = split_nodes_links([node])
+		self.assertListEqual([TextNode("This is text with a ", TextType.NORMAL), 
+						TextNode("link to google", TextType.LINKS, "https://www.google.com"),
+						TextNode(" and a second ", TextType.NORMAL),
+						TextNode("link to boots", TextType.LINKS, "https://www.boot.dev"),
+						TextNode(" with text after.", TextType.NORMAL),
+						], new_nodes)
+		
+	def test_split_links_multiple_nodes(self):
+		pass
+
+	def test_split_links_no_links(self):
+		pass
+
 if __name__ == "__main__":
     unittest.main()
