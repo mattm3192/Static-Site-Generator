@@ -67,5 +67,32 @@ class Markdowntotext(unittest.TestCase):
 
 		self.assertTrue("unbalanced" in str(context.exception))
 
+	def test_extract_markdown_images(self):
+		text = "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+		matches = extract_markdown_images(text)
+		self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+	def test_extract_markdown_images_multiple(self):
+		text = "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![logo](https://www.google.com)"
+		matches = extract_markdown_images(text)
+		self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png"), ("logo", "https://www.google.com")], matches)
+
+	def test_extract_markdown_links(self):
+		text = "This is text with a link [to boot dev](https://www.boot.dev)"
+		matches = extract_markdown_links(text)
+		self.assertListEqual([("to boot dev", "https://www.boot.dev")], matches)
+
+	def test_extract_markdown_links_multiple(self):
+		text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com)"
+		matches = extract_markdown_links(text)
+		self.assertListEqual([("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com")], matches)
+
+	def test_extract_markdown_no_results_and_erroneous_results(self):
+		text = "This is text with a link [to boot dev](https://www.boot.dev and an image [image](https://i.imgur.com/zjjcJKZ.png)"
+		link_matches = extract_markdown_links(text)
+		image_matches = extract_markdown_images(text)
+		self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], link_matches)
+		self.assertListEqual([], image_matches)
+
 if __name__ == "__main__":
     unittest.main()
