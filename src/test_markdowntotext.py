@@ -157,6 +157,9 @@ class Markdowntotext(unittest.TestCase):
 						TextNode("link to boots", TextType.IMAGES, "https://www.boot.dev"),
 						TextNode(" with text after.", TextType.NORMAL),
 						], newer_nodes)
+		
+	def test_text_to_textnode(self):
+		pass
 
 if __name__ == "__main__":
     unittest.main()
