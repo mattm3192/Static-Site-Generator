@@ -34,7 +34,7 @@ class Markdowntotext(unittest.TestCase):
 		self.assertEqual(new_nodes[1].text, "italic")
 		self.assertEqual(new_nodes[2].text, " word")
 
-	def test_markdown_to_text_oldnodes_multiple(self): #not finished
+	def test_markdown_to_text_oldnodes_multiple(self):
 		old_nodes = []
 		old_nodes.append(TextNode("This is text with an _italic_ word", TextType.NORMAL))
 		old_nodes.append(TextNode("This is text with a **bold** word", TextType.NORMAL))
@@ -59,7 +59,7 @@ class Markdowntotext(unittest.TestCase):
 		self.assertEqual(newer_nodes[4].text, "bold")
 		self.assertEqual(len(newer_nodes), 8)
 
-	def test_markdown_to_text_unbalanced(self): #not finished
+	def test_markdown_to_text_unbalanced(self): 
 		node = TextNode("This is text with an **unbalanced delimiter", TextType.NORMAL)
 
 		with self.assertRaises(Exception) as context:
@@ -103,11 +103,10 @@ class Markdowntotext(unittest.TestCase):
 						TextNode("second image", TextType.IMAGES, "https://i.imgur.com/3elNhQu.png"),
 						], new_nodes)
 		
-	def test_split_images_multiple_nodes(self):
-		pass
-
 	def test_split_images_no_images(self):
-		pass
+		node = TextNode("This is text with no images and one image with incorrect syntax [second image](https://i.imgur.com/3elNhQu.png)", TextType.NORMAL)
+		new_nodes = split_nodes_image([node])
+		self.assertListEqual([TextNode("This is text with no images and one image with incorrect syntax [second image](https://i.imgur.com/3elNhQu.png)", TextType.NORMAL)], new_nodes)
 		
 	def test_split_links(self):
 		node = TextNode("This is text with a [link to google](https://www.google.com) and a second [link to boots](https://www.boot.dev) with text after.", TextType.NORMAL)
@@ -119,11 +118,45 @@ class Markdowntotext(unittest.TestCase):
 						TextNode(" with text after.", TextType.NORMAL),
 						], new_nodes)
 		
-	def test_split_links_multiple_nodes(self):
-		pass
-
 	def test_split_links_no_links(self):
-		pass
+		node = TextNode("This is text with a non link to google](https://www.google.com) and a second link that's incorrectly formatted as an image ![link to boots](https://www.boot.dev) with text after.", TextType.NORMAL)
+		new_nodes = split_nodes_links([node])
+		self.assertListEqual([TextNode("This is text with a non link to google](https://www.google.com) and a second link that's incorrectly formatted as an image ![link to boots](https://www.boot.dev) with text after.", TextType.NORMAL)], new_nodes)
+
+	def test_split_links_and_images_multiple_nodes_with_blankspaces(self):
+		node = TextNode("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)     ", TextType.NORMAL)
+		node1 = TextNode("This is text with no images and one image with incorrect syntax [second image](https://i.imgur.com/3elNhQu.png)", TextType.NORMAL)
+		node2 = TextNode("     [link to google](https://www.google.com) and a second [link to boots](https://www.boot.dev) with text after.", TextType.NORMAL)
+		node3 = TextNode("This is a non link to google](https://www.google.com) and a second link that's incorrectly formatted as an image ![link to boots](https://www.boot.dev) with text after.", TextType.NORMAL)
+		new_nodes = split_nodes_links([node, node1, node2, node3])
+		self.assertListEqual([TextNode("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)     ", TextType.NORMAL),
+						TextNode("This is text with no images and one image with incorrect syntax ", TextType.NORMAL),
+						TextNode("second image", TextType.LINKS, "https://i.imgur.com/3elNhQu.png"),
+						TextNode("     ", TextType.NORMAL),
+						TextNode("link to google", TextType.LINKS, "https://www.google.com"),
+						TextNode(" and a second ", TextType.NORMAL),
+						TextNode("link to boots", TextType.LINKS, "https://www.boot.dev"),
+						TextNode(" with text after.", TextType.NORMAL),
+						TextNode("This is a non link to google](https://www.google.com) and a second link that's incorrectly formatted as an image ![link to boots](https://www.boot.dev) with text after.", TextType.NORMAL)
+						], new_nodes)
+
+		newer_nodes = split_nodes_image(new_nodes)
+		self.assertListEqual([TextNode("This is text with an ", TextType.NORMAL),
+						TextNode("image", TextType.IMAGES, "https://i.imgur.com/zjjcJKZ.png"),
+						TextNode(" and another ", TextType.NORMAL),
+						TextNode("second image", TextType.IMAGES, "https://i.imgur.com/3elNhQu.png"),
+						TextNode("     ", TextType.NORMAL),
+						TextNode("This is text with no images and one image with incorrect syntax ", TextType.NORMAL),
+						TextNode("second image", TextType.LINKS, "https://i.imgur.com/3elNhQu.png"),
+						TextNode("     ", TextType.NORMAL),
+						TextNode("link to google", TextType.LINKS, "https://www.google.com"),
+						TextNode(" and a second ", TextType.NORMAL),
+						TextNode("link to boots", TextType.LINKS, "https://www.boot.dev"),
+						TextNode(" with text after.", TextType.NORMAL),
+						TextNode("This is a non link to google](https://www.google.com) and a second link that's incorrectly formatted as an image ", TextType.NORMAL),
+						TextNode("link to boots", TextType.IMAGES, "https://www.boot.dev"),
+						TextNode(" with text after.", TextType.NORMAL),
+						], newer_nodes)
 
 if __name__ == "__main__":
     unittest.main()
