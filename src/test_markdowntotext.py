@@ -159,7 +159,20 @@ class Markdowntotext(unittest.TestCase):
 						], newer_nodes)
 		
 	def test_text_to_textnode(self):
-		pass
+		text = "This is **bold text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+		new_nodes = text_to_textnodes(text)
+		self.assertEqual([TextNode("This is ", TextType.NORMAL),
+						TextNode("bold text", TextType.BOLD),
+						TextNode(" with an ", TextType.NORMAL),
+						TextNode("italic", TextType.ITALIC),
+						TextNode(" word and a ", TextType.NORMAL),
+						TextNode("code block", TextType.CODE),
+						TextNode(" and an ", TextType.NORMAL),
+						TextNode("obi wan image", TextType.IMAGES, "https://i.imgur.com/fJRm4Vk.jpeg"),
+						TextNode(" and a ", TextType.NORMAL),
+						TextNode("link", TextType.LINKS, "https://boot.dev"),
+						], new_nodes)
+
 
 if __name__ == "__main__":
     unittest.main()
