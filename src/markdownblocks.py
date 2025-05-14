@@ -160,7 +160,6 @@ def markdown_to_html_node(markdown):
 				raise Exception("Unable to determine block type from provided markdown blocks.")
 	return ParentNode("div", block_nodes)
 		
-
 def text_to_children(text):
 	HTML_nodes = []
 	text_nodes = text_to_textnodes(text)
@@ -169,3 +168,12 @@ def text_to_children(text):
 		HTML_nodes.append(text_node_to_html_node(node))
 
 	return HTML_nodes
+
+def extract_title(markdown):
+	blocks = markdown_to_blocks(markdown)
+	for block in blocks:
+		block_type = block_to_block_type(block)
+		if block_type == BlockType.HEADING:
+			if block.startswith("# "):
+				return block[2:].strip()
+	raise ValueError("There was no h1 header in the markdown file.")

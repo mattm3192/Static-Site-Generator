@@ -281,5 +281,29 @@ This is a [link](https://example.com) and an ![image](img.png)
 		html = node.to_html()
 		self.assertEqual(html, '<div><h1>Header 1 <a href="https://example.com">link</a></h1><h2>Header 2 <img src="img.png" alt="image"/></h2></div>')
 
+	def test_markdwon_extract_title(self):
+		md = """
+#   Tolkien Fan Club  
+
+![JRR Tolkien sitting](/images/tolkien.png)
+
+Here's the deal, **I like Tolkien**.
+"""
+
+		title = extract_title(md)
+		self.assertEqual(title, "Tolkien Fan Club")
+
+		md2 = """
+## No h1 header here Gandalf
+
+![JRR Tolkien sitting](/images/tolkien.png)
+
+Here's the deal, **I like Tolkien**.
+"""
+
+		with self.assertRaises(ValueError):
+			title = extract_title(md2)
+
+
 if __name__ == "__main__":
     unittest.main()
