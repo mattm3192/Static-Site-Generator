@@ -15,6 +15,10 @@ def main():
 	template_path = "template.html"
 	dest_path = "public/index.html"
 	generate_page(from_path, template_path, dest_path)
+	generate_page("content/blog/glorfindel/index.md", template_path, "public/blog/glorfindel/index.html")
+	generate_page("content/blog/tom/index.md", template_path, "public/blog/tom/index.html")
+	generate_page("content/blog/majesty/index.md", template_path, "public/blog/majesty/index.html")
+	generate_page("content/contact/index.md", template_path, "public/contact/index.html")
 
 def copy_static(source_dir, target_dir):
 	if os.path.exists(target_dir):
@@ -39,25 +43,25 @@ def copy_static(source_dir, target_dir):
 			copy_static(src_path, dest_path)
 
 def generate_page(from_path, template_path, dest_path):
-	print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
+	print(f"Generating page from {from_path} to {dest_path} using {template_path}.\n")
 	
 	if os.path.exists(from_path):
 		if os.path.isfile(from_path) and from_path.endswith(".md"):
 			with open(from_path, "r") as f1:
 				from_contents_md = f1.read()
 		else:
-			raise ValueError(f"The file at {from_path} is not a markdown file.")
+			raise ValueError(f"The file at {from_path} is not a markdown file.\n")
 	else:
-		raise ValueError(f"{from_path} directory does not exist.")
+		raise ValueError(f"{from_path} directory does not exist.\n")
 	
 	if os.path.exists(template_path):
 		if os.path.isfile(template_path) and template_path.endswith(".html"):
 			with open(template_path, "r") as f2:
 				template_contents_html = f2.read()
 		else:
-			raise ValueError(f"The file at {template_path} is not a html file.")
+			raise ValueError(f"The file at {template_path} is not a html file.\n")
 	else:
-		raise ValueError(f"{template_path} directory does not exist.")
+		raise ValueError(f"{template_path} directory does not exist.\n")
 	
 	content_html = markdown_to_html_node(from_contents_md).to_html()
 	title = extract_title(from_contents_md)
@@ -66,9 +70,9 @@ def generate_page(from_path, template_path, dest_path):
 	template_contents_html = template_contents_html.replace("{{ Content }}", content_html)
 
 	if ("{{ Title }}" not in template_contents_html and "{{ Content }}" not in template_contents_html) and (title in template_contents_html and content_html in template_contents_html):
-		print(f"Title and content tags in {template_path} file were replaced correctly")
+		print(f"Title and content tags in {template_path} file were replaced correctly\n")
 	else:
-		raise Exception("'{{ Title }}' and '{{ Content }}' tags where found in in the html template or the indended replacement strings were not found.")
+		raise Exception("'{{ Title }}' and '{{ Content }}' tags where found in in the html template or the indended replacement strings were not found.\n")
 
 	if os.path.dirname(dest_path) != "":
 		os.makedirs(os.path.dirname(dest_path), exist_ok=True)
