@@ -2,19 +2,21 @@
 #from htmlnode import *
 #from markdowntotext import *
 from markdownblocks import *
-import os, shutil
+import os, shutil, sys
 
 def main():
-	if os.path.exists("public"):
-		shutil.rmtree("public")
+	basepath = sys.argv[1] if len(sys.argv) > 1 else "/"
+
+	if os.path.exists("docs"):
+		shutil.rmtree("docs")
 	source = "static"
-	target = "public"
+	target = "docs"
 	copy_static(source, target)
 	
 	from_path = "content"
 	template_path = "template.html"
-	dest_path = "public"
-	generate_pages_recursive(from_path, template_path, dest_path)
+	dest_path = "docs"
+	generate_pages_recursive(from_path, template_path, dest_path, basepath)
 
 def copy_static(source_dir, target_dir):
 	if os.path.exists(target_dir):
@@ -38,7 +40,7 @@ def copy_static(source_dir, target_dir):
 			os.mkdir(dest_path)
 			copy_static(src_path, dest_path)
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
 	print(f"Generating page from {from_path} to {dest_path} using {template_path}.\n")
 	
 	if os.path.exists(from_path):
@@ -64,11 +66,15 @@ def generate_page(from_path, template_path, dest_path):
 
 	template_contents_html = template_contents_html.replace("{{ Title }}", title)
 	template_contents_html = template_contents_html.replace("{{ Content }}", content_html)
+	
 
 	if ("{{ Title }}" not in template_contents_html and "{{ Content }}" not in template_contents_html) and (title in template_contents_html and content_html in template_contents_html):
 		print(f"Title and content tags in {template_path} file were replaced correctly\n")
 	else:
-		raise Exception("'{{ Title }}' and '{{ Content }}' tags where found in in the html template or the indended replacement strings were not found.\n")
+		raise Exception("'{{ Title }}' and '{{ Content }}' tags where found in in the html template or the intended replacement strings were not found.\n")
+	
+	template_contents_html = template_contents_html.replace('href="/', f'href="{basepath}')
+	template_contents_html = template_contents_html.replace('src="/', f'src="{basepath}')
 
 	if os.path.dirname(dest_path) != "":
 		os.makedirs(os.path.dirname(dest_path), exist_ok=True)
@@ -76,7 +82,7 @@ def generate_page(from_path, template_path, dest_path):
 	with open(dest_path, "w") as f_dest:
 		f_dest.write(template_contents_html)
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
 	local_items = os.listdir(dir_path_content)
 	for item in local_items:
 		item_full_path = os.path.join(dir_path_content, item)
@@ -87,11 +93,11 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
 
 			os.makedirs(os.path.dirname(new_dest_dir), exist_ok=True)
 
-			generate_page(item_full_path, template_path, new_dest_dir)
+			generate_page(item_full_path, template_path, new_dest_dir, basepath)
 
 		elif os.path.isdir(item_full_path):
 			new_dest_dir =os.path.join(dest_dir_path, item)
-			generate_pages_recursive(item_full_path, template_path, new_dest_dir)
+			generate_pages_recursive(item_full_path, template_path, new_dest_dir, basepath)
 
 
 
