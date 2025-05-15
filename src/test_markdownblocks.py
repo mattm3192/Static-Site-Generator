@@ -301,8 +301,9 @@ Here's the deal, **I like Tolkien**.
 Here's the deal, **I like Tolkien**.
 """
 
-		with self.assertRaises(ValueError):
-			title = extract_title(md2)
+		with self.assertRaises(ValueError) as context:
+			extract_title(md2)
+		self.assertIn("There was no h1 header", str(context.exception))
 
 
 if __name__ == "__main__":

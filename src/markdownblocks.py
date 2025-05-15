@@ -24,7 +24,7 @@ def block_to_block_type(block):
 		return BlockType.CODE
 	
 	for line in lines:
-		if not line.startswith("> "):
+		if line.strip() and not line.strip().startswith(">"):
 			break
 	else:
 		return BlockType.QUOTE
